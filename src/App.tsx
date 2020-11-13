@@ -9,6 +9,7 @@ import SubMenu from 'antd/lib/menu/SubMenu';
 import EntityGenerator from './components/EntityGenerator';
 import ManyToOneCreator from './components/ManyToOneCreator';
 import DTOGenerator from './components/DTOGenerator';
+import ServiceGenerator from './components/ServiceGenerator';
 
 const { Sider, Header, Footer, Content } = Layout;
 
@@ -23,7 +24,7 @@ function App() {
             <h1 style={{ color: '#fff', fontSize: '30px' }}>PPv3</h1>
           </NavLink>
         </div>
-        <Menu theme='dark' mode='inline' defaultOpenKeys={['1', '2']}>
+        <Menu theme='dark' mode='inline' defaultOpenKeys={['1', '2', '3']}>
           <SubMenu title="Entity" key='1'>
             <Menu.Item title='Generate entity' key='1.1'>
               <NavLink to='/generate-entity'>Generate entity</NavLink>
@@ -33,8 +34,13 @@ function App() {
             </Menu.Item>
           </SubMenu>
           <SubMenu title="Data Transfer Object" key='2'>
-          <Menu.Item title='Generate entity' key='2.1'>
+            <Menu.Item title='Generate entity' key='2.1'>
               <NavLink to='/dto-generator'>DTO Generator</NavLink>
+            </Menu.Item>
+          </SubMenu>
+          <SubMenu title="Other" key='3'>
+            <Menu.Item title='Generate Service' key='3.1'>
+              <NavLink to='/service-generator'>Service Generator</NavLink>
             </Menu.Item>
           </SubMenu>
         </Menu>
@@ -62,6 +68,7 @@ function App() {
               <Route path='/generate-entity' component={EntityGenerator} />
               <Route path='/many-to-one-creator' component={ManyToOneCreator} />
               <Route path='/dto-generator' component={DTOGenerator} />
+              <Route path='/service-generator' component={ServiceGenerator} />
 
             </div>
           </Content>

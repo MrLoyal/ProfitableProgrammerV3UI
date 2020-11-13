@@ -95,6 +95,7 @@ function ManyToOnePropsTable(props: ManyToOnePropsTableProps) {
 
     return (
         <Table
+            pagination={false}
             rowKey={(row: EntityManyToOneProperty) => row.javaType + '_' + row.name}
             columns={columns}
             dataSource={dts}

@@ -3,11 +3,13 @@ import promiseMiddleware from './middlewares/promiseMiddleware';
 import entityGeneratorReducer from './entitygenerator/entityGeneratorReducer';
 import m2oReducer from './manytoone/reducer';
 import dtoGeneratorReducer from './dtogenerator/reducer';
+import serviceGeneratorReducer from './servicegenerator/reducer'
 
 const rootReducer = combineReducers({
     entityGenerator: entityGeneratorReducer,
     manyToOne: m2oReducer,
-    dtoGenerator: dtoGeneratorReducer
+    dtoGenerator: dtoGeneratorReducer,
+    servicegenerator: serviceGeneratorReducer
 });
 
 export type RootState = ReturnType<typeof rootReducer>

@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 
 import { DTOGeneratorProps } from "../store/dtogenerator/types";
-import { Row, Col, Select, Tabs, Input, Form, Button } from 'antd';
+import { Row, Col, Select, Tabs, Input, Form, Button, notification, Checkbox } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { listEntities } from '../store/manytoone/actions';
 import { RootState } from '../store/index';
@@ -10,6 +10,8 @@ import { listEntityProperties } from '../store/dtogenerator/actions'
 import { Store } from 'antd/lib/form/interface';
 import { toWrapperType } from '../utils';
 import ManyToOnePropsTable from './ManyToOnePropsTables';
+
+import Agent from '../agent/axios';
 
 const { Option } = Select;
 
@@ -21,6 +23,10 @@ interface M2oSelect {
 function DTOGenerator(props: DTOGeneratorProps) {
     const dispatch = useDispatch();
     const [dtoName, setDtoName] = useState('');
+    const [entityName, setEntityName] = useState('');
+    // const [genListItemRepo, setGenListItemRepo] = useState(false);
+    // const [genDetailsRepo, setGenDetailsRepo] = useState(false);
+    const [repoType, setRepoType] = useState('LIST_ITEM');
     const [basicSelectedKeys, setBasicSelectedKeys] = useState(new Array<string>());
     const [form] = Form.useForm();
     const entityList = useSelector((state: RootState) => state.manyToOne.entityList);
@@ -42,10 +48,11 @@ function DTOGenerator(props: DTOGeneratorProps) {
             form.setFieldsValue(store);
         }
 
-    }, [basicPropsList])
+    }, [basicPropsList, form])
 
     function onEntitySelectionChange(value: string) {
         console.log("EntitySelectionChanged: ", value);
+        setEntityName(value);
         let dtoName = value + "DTO";
         setDtoName(dtoName);
 
@@ -63,23 +70,38 @@ function DTOGenerator(props: DTOGeneratorProps) {
     }
 
     function onFormFinish(values: any) {
-        console.log("Form values: ", values);
-
-        const basicProps: any = [];
-        basicSelectedKeys.forEach(k => {
-            const element = {
-                entityPropName: k,
-                dtoPropType: values['dtoType_' + k]
-            }
-            basicProps.push(element);
-        })
 
         const data = {
-            basicProps: basicProps,
-            dtoName: dtoName
-        }
+            entityName: entityName,
+            basicProps: basicSelectedKeys,
+            dtoName: dtoName,
+            m2oSelection: m2oSelection,
+            repoType: repoType
+            // genListItemRepo: genListItemRepo,
+            // genDetailsRepo: genDetailsRepo
+        };
 
-        console.log("Data: ", data);
+        console.log("Now POST this data: ", data);
+
+        Agent.createDTO(data)
+            .then(resp => {
+                console.log(resp);
+                notification.success({
+                    message: 'Success',
+                    description: 'DTO created successfully!'
+                })
+            })
+            .catch((error: any) => {
+                console.log(error)
+                let msg = JSON.stringify(error);
+                if (error.message) {
+                    msg = error.message;
+                }
+                notification.error({
+                    message: 'Error',
+                    description: msg
+                })
+            })
     }
 
     function basicPropSelectedHandler(keys: Array<string>) {
@@ -112,6 +134,28 @@ function DTOGenerator(props: DTOGeneratorProps) {
         return null;
     }
 
+    // function onGenListItemRepoChanged(evt: any){
+    //     const checked: boolean = evt.target.checked;
+    //     setGenListItemRepo(checked);
+    // }
+
+    // function onGenDetailsRepoChanged(evt: any){
+    //     const checked: boolean = evt.target.checked;
+    //     setGenDetailsRepo(checked);
+    // }
+
+    function onRepoTypeChanged(value: string) {
+        setRepoType(value);
+        if (value === 'DETAILS') {
+            let dtoName = entityName + "DetailsDTO";
+            setDtoName(dtoName);
+        } else if (value === 'LIST_ITEM') {
+            let dtoName = entityName + "DTO";
+            setDtoName(dtoName);
+        }
+
+    }
+
     return (
         <Fragment>
             <Row>
@@ -133,6 +177,20 @@ function DTOGenerator(props: DTOGeneratorProps) {
                 </Col>
                 <Col span={8}>
                     <Input value={dtoName} onChange={(value) => setDtoName(value.target.value)} />
+                </Col>
+            </Row>
+            <Row style={{ marginTop: '16px' }}>
+                <Col span={4}>
+                    Generate repository:
+                </Col>
+                <Col span={8}>
+                    {/* <Checkbox checked={genListItemRepo} onChange={onGenListItemRepoChanged} >List item</Checkbox>
+                    <Checkbox checked={genDetailsRepo} onChange={onGenDetailsRepoChanged} >Details</Checkbox> */}
+                    <Select value={repoType} onChange={onRepoTypeChanged} style={{ width: '100%' }}>
+                        <Select.Option key={0} value={'NONE'}>None</Select.Option>
+                        <Select.Option key={1} value={'LIST_ITEM'}>List Item</Select.Option>
+                        <Select.Option key={2} value={'DETAILS'}>Details</Select.Option>
+                    </Select>
                 </Col>
             </Row>
 

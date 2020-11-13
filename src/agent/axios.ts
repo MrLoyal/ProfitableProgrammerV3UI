@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-axios.defaults.baseURL='http://localhost:8080/api';
+axios.defaults.baseURL='http://localhost:6788/api';
 
 const Agent = {
     listTables: () => {
@@ -27,6 +27,17 @@ const Agent = {
     listEntityBasicFields: (entityName: string) => {
         return axios.get('/listEntityBasicFields?entityName=' + entityName);
     },
+
+    createDTO: (data: any) => {
+        return axios.post('/createDTO', data);
+    },
+
+    listDTOs: () => {
+        return axios.get('/listDTOs');
+    },
+    createService: (data: any) => {
+        return axios.post('/createService', data);
+    }
     
 }
 
